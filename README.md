@@ -1,7 +1,7 @@
 # Findme
 AWS - Azure - GCP Bucket Finder
 
-# Not Completed To Be Continued 
+# Under Development
 
 # Todo 
 
