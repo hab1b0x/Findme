@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby 
-
+# 
+# FindMe - Finds the given bucket in all cloud providers and prints the result beside that it checks against misconfigured buckets.
+#
+#
 # Path settings 
 $:.unshift(File.join(File.dirname(__FILE__), 'lib'))
 
