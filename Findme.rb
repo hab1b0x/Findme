@@ -13,6 +13,11 @@ options = {
     "verbose" => nil,
     "logger" => nil,
     "output" => nil,
+    "wordlist" => nil,
+    "threads" => nil,
+    "help" => false,
+    "version" => false,
+
 }
 
 # Parsing Arguments
@@ -21,8 +26,16 @@ opt_parser = OptionParser.new do |opts|
     opts.banner =
         "Findme v#{FindMe::VERSION}\n\n Usage: findme [options]\n\n" 
     
-    opts.on("-a", "--aws S3" , "S3 Bucket Name") do |target|
-        options["target"] = target
+    opts.on("-a", "--aws S3" , "S3 Bucket Name") do |aws|
+        options["aws"] = aws
+    end
+
+    opts.on("-g", "--gcp GCP" , "GCP Bucket Name") do |gcp|
+        options["gcp"] = gcp
+    end
+
+    opts.on("-z", "--azure AZURE" , "Azure Bucket Name") do |azure|
+        options["azure"] = azure
     end
 
     opts.on("-f", "--file FILE", "File with list of targets") do |file|
@@ -84,16 +97,11 @@ opt_parser = OptionParser.new do |opts|
         puts opts
         puts "\nExamples:"
         puts "  findme -a bucket"
-        puts "  findme -f targets.txt"
-        puts "  findme -T 10 -p"
+        puts "  findme -g bucket"
+        puts "  findme -z bucket"
+        puts "  findme -f file.txt"
+        puts "  findme -T 10 -L log.txt -o output.txt"
         puts "  findme -O options.json"
-        puts "  findme -o results.json"
-        puts "  findme -o results.yaml"
-        puts "  findme -o results.json -O options.json"
-        puts "  findme -o results.json -O options.json -T 10"
-        puts "  findme -o results.json -O options.json -T 10 -L log.txt"
-        puts "  findme -o results.json -O options.json -T 10 -L log.txt -v"
-        puts "  findme -o results.json -O options.json -T 10 -L log.txt -v -p"
         puts ""
         exit
     end
@@ -101,19 +109,47 @@ end
 
 opt_parser.parse!
 
-if options["target"].nil?
+if options.nil?
     puts (FindMe::Banner)
     puts opt_parser
     exit
 end
 
-options["target"] do |target|
-    FindMe.new(target, options).run
+options["aws"] do |aws|
+    FindMe.new(aws, options).run
+end
+
+options["gcp"] do |gcp|
+    FindMe.new(gcp, options).run
+end
+
+options["azure"] do |azure|
+    FindMe.new(azure, options).run
 end
 
 class String
     def red; "\e[31m#{self}\e[0m" end
   end
 
-scan_engine = FindMe::Scanner.new(options["target"])
-scan_engine.scan
+    scan_engine =  FindMe::Scanner.new(options["aws"])
+    scan_engine.scan_s3 unless options["aws"].nil?
+    
+
+    scan_engine = FindMe::Scanner.new(options["gcp"])
+    scan_engine.scan_gcp unless options["gcp"].nil?
+
+
+    scan_engine = FindMe::Scanner.new(options["azure"])
+    scan_engine.scan_azure unless options["azure"].nil?
+
+# if scan_engine = FindMe::Scanner.new(options["aws" ? "s3" : "aws", ])
+# scan_engine.scan_s3 
+# end
+
+# if scan_engine = FindMe::Scanner.new(options["target"])
+# scan_engine.scan_gcp 
+# end
+
+# if scan_engine = FindMe::Scanner.new(options["target"])
+# scan_engine.scan_azure 
+# end

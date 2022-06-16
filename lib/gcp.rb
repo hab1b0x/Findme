@@ -4,7 +4,7 @@ module FindMe
     
         def initialize(bucket)
             @bucket = bucket
-            @domain = format('http://%s.storage.googleapi.com', 'http://%s.appspot.com' bucket)
+            @domain = format('http://%s.appspot.com', bucket)
         end
 
         def exists?
